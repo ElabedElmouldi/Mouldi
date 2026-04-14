@@ -1,10 +1,8 @@
-def get_signal(data):
+def trend_strategy(data):
+    return data["trend"] * 2
 
-    score = data["momentum"] - data["volatility"]
+def mean_reversion(data):
+    return (50 - data["rsi"]) / 10
 
-    if score > 0.5:
-        return "BUY"
-    elif score < -0.5:
-        return "SELL"
-
-    return "HOLD"
+def breakout(data):
+    return data["volume"] * data["momentum"]
