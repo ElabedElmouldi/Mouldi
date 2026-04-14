@@ -1,21 +1,30 @@
+watchlist = {}
 
-active_watchlist = {}
+def add_coin(coin):
 
-def add_to_watchlist(coin):
+    symbol = coin["symbol"]
 
-    active_watchlist[coin["symbol"]] = {
-        "entry": coin["price"],
-        "score": coin["score"]
-    }
+    if symbol not in watchlist:
+        watchlist[symbol] = {
+            "entry": coin["price"],
+            "score": coin["score"],
+            "triggered": False
+        }
 
 
-def update_watchlist(symbol, new_price):
+def check_explosion(symbol, current_price):
 
-    if symbol not in active_watchlist:
-        return None
+    if symbol not in watchlist:
+        return False, 0
 
-    entry = active_watchlist[symbol]["entry"]
+    data = watchlist[symbol]
 
-    change = (new_price - entry) / entry * 100
+    entry = data["entry"]
 
-    return change
+    change = (current_price - entry) / entry * 100
+
+    if change >= 1.5 and not data["triggered"]:
+        data["triggered"] = True
+        return True, change
+
+    return False, change
