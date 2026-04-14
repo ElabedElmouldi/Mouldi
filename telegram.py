@@ -1,15 +1,21 @@
-import requests
 
-TOKEN = "8738851163:AAEe7YI7p05xSxsRSruu34taIaUk47aHCQY"
-CHAT_ID = "5067771509"
+
+import os
+import requests
 
 def send(msg):
 
-    url = f"https://api.telegram.org/bot{TOKEN}/sendMessage"
+    token = os.getenv("8738851163:AAEe7YI7p05xSxsRSruu34taIaUk47aHCQY")
+    chat = os.getenv("5067771509")
 
-    data = {
-        "chat_id": CHAT_ID,
-        "text": msg
-    }
+    if not token or not chat:
+        return
 
-    requests.post(url, data=data)
+    requests.post(
+        f"https://api.telegram.org/bot{token}/sendMessage",
+        data={"chat_id": chat, "text": msg}
+    )
+
+
+
+)
