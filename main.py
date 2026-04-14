@@ -1,60 +1,59 @@
-from market import get_market
-from brain import ai_score
-from strategies import trend_strategy, mean_reversion, breakout
-from optimizer import Optimizer
-from risk import risk_check
-from portfolio import Portfolio
-from analytics import Analytics
+from scanner import scan_market
+from watcher import add_to_watchlist, update_watchlist
+from telegram import send
+import random
+import time
 
-from notifications.signals import send_signal
-from notifications.risk_alerts import send_risk
-from notifications.reports import send_dashboard
+print("🚀 REAL-TIME SCANNER v2 STARTED")
 
-portfolio = Portfolio()
-optimizer = Optimizer()
-analytics = Analytics()
+# fake live market
+def generate_market():
 
-def run():
+    coins = []
 
-    print("🚀 AI HEDGE FUND v4 STARTED")
+    for i in range(600):
 
-    for i in range(200):
+        coins.append({
+            "symbol": f"COIN{i}",
+            "price": 100 + random.randint(-5, 5),
+            "momentum": random.uniform(1, 2),
+            "volume": random.uniform(1, 2),
+            "trend_5m": random.choice(["UP", "DOWN"]),
+            "trend_1h": random.choice(["UP", "DOWN"]),
+            "volatility": random.uniform(0.8, 2),
+            "near_resistance": random.choice([True, False])
+        })
 
-        data = get_market()
+    return coins
 
-        if not risk_check(data):
-            send_risk(data["volatility"])
-            continue
 
-        scores = {
-            "AI": ai_score(data),
-            "TREND": trend_strategy(data),
-            "MEAN": mean_reversion(data),
-            "BREAKOUT": breakout(data)
-        }
+while True:
 
-        best = optimizer.best(scores)
+    market = generate_market()
 
-        score = scores[best]
+    results = scan_market(market)
 
-        pnl = score * 0.1
+    print("\n💥 TOP EXPLOSION CANDIDATES:")
 
-        portfolio.update(pnl)
-        analytics.add(pnl)
+    for c in results[:5]:
 
-        # إرسال إشارات فقط القوية
-        if abs(score) > 2.2:
-            send_signal(best, score, portfolio.balance, data)
+        print(c["symbol"], c["score"])
 
-        # تقرير كل 20 خطوة
-        if i % 20 == 0:
-            send_dashboard(
-                portfolio.balance,
-                analytics.performance(),
-                analytics.win_rate()
-            )
+        add_to_watchlist(c)
 
-    print("DONE")
+        send(f"""
+💥 EXPLOSION ALERT
+Symbol: {c['symbol']}
+Score: {c['score']}
+Price: {c['price']}
+""")
 
-if __name__ == "__main__":
-    run()
+    # simulate tracking
+    for c in results[:3]:
+
+        change = update_watchlist(c["symbol"], c["price"] + random.randint(-3, 6))
+
+        if change and change > 3:
+            send(f"📈 {c['symbol']} UP {change:.2f}%")
+
+    time.sleep(10)
