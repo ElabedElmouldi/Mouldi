@@ -5,7 +5,7 @@ import requests
 
 def send(msg):
 
-    token = os.getenv("8738851163:AAEe7YI7p05xSxsRSruu34taIaUk47aHCQY")
+    token = os.getenv("8439548325:AAHOBBHy7EwcX3J5neIaf6iJuSjyGJCuZ68")
     chat = os.getenv("5067771509")
 
     if not token or not chat:
