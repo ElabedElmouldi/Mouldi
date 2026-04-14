@@ -1,29 +1,60 @@
-from strategy import get_signal
-from risk import check_risk
-from execution import execute_trade
+from market import get_market
+from brain import ai_score
+from strategies import trend_strategy, mean_reversion, breakout
+from optimizer import Optimizer
+from risk import risk_check
 from portfolio import Portfolio
-from telegram import send
+from analytics import Analytics
+
+from notifications.signals import send_signal
+from notifications.risk_alerts import send_risk
+from notifications.reports import send_dashboard
 
 portfolio = Portfolio()
+optimizer = Optimizer()
+analytics = Analytics()
 
 def run():
 
-    print("🚀 GOD MODE V2 PRO STARTED")
+    print("🚀 AI HEDGE FUND v4 STARTED")
 
-    while True:
+    for i in range(200):
 
-        data = {
-            "momentum": 1.2,
-            "volatility": 0.7
-        }
+        data = get_market()
 
-        signal = get_signal(data)
-
-        if not check_risk(data):
+        if not risk_check(data):
+            send_risk(data["volatility"])
             continue
 
-        result = execute_trade(signal)
+        scores = {
+            "AI": ai_score(data),
+            "TREND": trend_strategy(data),
+            "MEAN": mean_reversion(data),
+            "BREAKOUT": breakout(data)
+        }
 
-        portfolio.update(result)
+        best = optimizer.best(scores)
 
-        send(f"Signal: {signal} | Balance: {portfolio.balance}")
+        score = scores[best]
+
+        pnl = score * 0.1
+
+        portfolio.update(pnl)
+        analytics.add(pnl)
+
+        # إرسال إشارات فقط القوية
+        if abs(score) > 2.2:
+            send_signal(best, score, portfolio.balance, data)
+
+        # تقرير كل 20 خطوة
+        if i % 20 == 0:
+            send_dashboard(
+                portfolio.balance,
+                analytics.performance(),
+                analytics.win_rate()
+            )
+
+    print("DONE")
+
+if __name__ == "__main__":
+    run()
