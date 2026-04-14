@@ -1,15 +1,13 @@
-
-
 import os
 import requests
 
 def send(message):
 
-    token = os.getenv("8439548325:AAHOBBHy7EwcX3J5neIaf6iJuSjyGJCuZ68")
-    chat_id = os.getenv("5067771509")
+    token = os.getenv("BOT_TOKEN")
+    chat_id = os.getenv("CHAT_ID")
 
     if not token or not chat_id:
-        print("❌ Missing BOT_TOKEN or CHAT_ID")
+        print("❌ Missing Telegram config")
         return
 
     url = f"https://api.telegram.org/bot{token}/sendMessage"
@@ -19,6 +17,6 @@ def send(message):
             "chat_id": chat_id,
             "text": message
         })
-        print("✅ Message sent")
+        print("✅ Sent")
     except Exception as e:
-        print("❌ Telegram error:", e)
+        print("❌ Error:", e)
