@@ -1,7 +1,5 @@
 
 
-im
-
 import os
 import requests
 
